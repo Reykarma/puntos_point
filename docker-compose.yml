@@ -1,0 +1,80 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/myapp_development
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - mailcatcher
+      - sidekiq
+    command: >
+      bash -c "
+      until nc -z db 5432; do
+        echo 'Waiting for PostgreSQL...';
+        sleep 2;
+      done;
+      echo 'Creating database...';
+      RAILS_ENV=development rake db:create || echo 'Database already exists.';
+      echo 'Migrating database...';
+      RAILS_ENV=development rake db:migrate;
+      echo 'Seeding database...';
+      RAILS_ENV=development rake db:seed;
+      echo 'Starting server...';
+      rm -f /app/tmp/pids/server.pid &&
+      rails server -b 0.0.0.0"
+
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: myapp_development
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  sidekiq:
+    build: .
+    command: >
+      bash -c "
+      until nc -z db 5432; do
+        echo 'Waiting for PostgreSQL...';
+        sleep 2;
+      done;
+      until nc -z redis 6379; do
+        echo 'Waiting for Redis...';
+        sleep 2;
+      done;
+      echo 'PostgreSQL and Redis are ready. Starting Sidekiq...';
+      bundle exec sidekiq"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/myapp_development
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
