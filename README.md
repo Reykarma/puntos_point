@@ -16,6 +16,7 @@
    ```
 
 ## Correr el Seed de Compras
+   docker exec -it puntos_point-web-1
 1. Abrir la consola de Rails:
    ```bash
    rails c
