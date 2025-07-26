@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Reporte Diario de Compras</h1>
+    <p>Hola <%= @admin.name %>,</p>
+    <p>Adjunto encontrarás el archivo CSV con las compras realizadas el día <%= Date.yesterday.strftime('%d de %B de %Y') %>.</p>
+    <p>¡Que tengas un excelente día!</p>
+  </body>
+</html>
