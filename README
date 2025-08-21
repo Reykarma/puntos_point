@@ -16,6 +16,7 @@
    ```
 ## Correr el Seed para datos iniciales
 ```bash
+   rails active_storage:install
    rails db:migrate
    rails db:seed
 ```
@@ -60,4 +61,10 @@ http://localhost:1080
    ```bash
    bundle exec rails generate rspec:install
    bundle exec rspec
+   ```
+
+   ## Pruebas
+1. Ejecutar prueba de Condición de carrera:
+   ```bash
+   RAILS_ENV=test bundle exec rspec spec/models/purchase_race_spec.rb
    ```

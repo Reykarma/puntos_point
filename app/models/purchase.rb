@@ -4,17 +4,17 @@ class Purchase < ApplicationRecord
   validates :purchased_at, presence: true
 
   belongs_to :client
-  belongs_to :product
+  belongs_to :product, touch: true
 
-  after_create :send_first_purchase_email, if: :first_purchase?
-
+  after_commit :send_first_purchase_email_if_first, on: :create
+    
   private
 
-  def first_purchase?
-    product.purchases.count == 1
-  end
-
-  def send_first_purchase_email
+  def send_first_purchase_email_if_first
+    first_id = Purchase.where(product_id: product_id).minimum(:id)
+    return unless first_id == id
+    
     PurchaseMailer.first_purchase_email(product, client).deliver_later
   end
+
 end

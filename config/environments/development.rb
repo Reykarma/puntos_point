@@ -73,4 +73,17 @@ Rails.application.configure do
     address: "mailcatcher",
     port: 1025
   }
+
+  config.action_controller.perform_caching = true
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/1'),
+    namespace: 'puntos_point:cache:dev',
+    pool_size: ENV.fetch('RAILS_MAX_THREADS', 5).to_i,
+    compress: true,
+    compress_threshold: 2.kilobytes,
+    error_handler: -> (method:, returning:, exception:) {
+      Rails.logger.warn("Redis cache error (#{method}): #{exception.class} - #{exception.message}")
+    }
+  }
+
 end

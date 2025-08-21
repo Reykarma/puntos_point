@@ -13,12 +13,10 @@ gem 'bootsnap', require: false
 gem 'whenever', require: false
 gem 'mailcatcher', group: :development
 gem 'active_model_serializers'
-
-# Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
-# Para cargar imágenes (puedes usar ActiveStorage nativo de Rails)
 gem 'image_processing', '~> 1.2'
+gem 'mini_magick'
 
 group :development do
   gem 'listen'
